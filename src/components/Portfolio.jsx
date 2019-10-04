@@ -1,4 +1,9 @@
 import React, { Component } from 'react';
+const axios = require('axios');
+
+const API_KEY = "ZWZTAOSWFD17KO03";
+
+
 
 class Portfolio extends Component {
 	constructor(props){
@@ -12,6 +17,20 @@ class Portfolio extends Component {
 			}
 		}
 	}
+	componentDidMount(){
+		axios.get("https://www.alphavantage.co/query?",{
+			params:{
+				function: "TIME_SERIES_DAILY",
+				symbol: "MSFT",
+				apikey: API_KEY
+			}
+		}).then(function(res){
+			console.log(res.data["Time Series (Daily)"][Object.keys(res.data["Time Series (Daily)"])[0]]);
+		}).catch(function(err){
+			console.log(err);
+		})
+		console.log("portfolio mounted.")
+	}
 	renderContent(){
 	}
 
@@ -21,7 +40,7 @@ class Portfolio extends Component {
 				<div className="row">{this.state.auth == null ? "Uncle Joe" : this.state.auth.userName}'s Portfolio</div>
 				<div className="row">
 					<div className="col">
-						<table class="table table-striped">
+						<table className="table table-striped">
 						  <thead>
 						    <tr>
 						      <th scope="col">Name</th>
@@ -51,12 +70,12 @@ class Portfolio extends Component {
 					<div className="col">
 						<form>
 						  <div className="form-group">
-						    <label for="Ticker">Ticker Symbol</label>
+						    <label htmlFor="Ticker">Ticker Symbol</label>
 						    <input type="text" className="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="TSLA, NFLX, AMZN..."/>
 						 
 						  </div>
 						  <div className="form-group">
-						    <label for="Quantity">Quantity</label>
+						    <label htmlFor="Quantity">Quantity</label>
 						    <input type="number" className="form-control" id="exampleInputPassword1" placeholder="12..."/>
 						    <small id="emailHelp" className="form-text text-muted">Please enter only whole quantities.</small>
 						  </div>
