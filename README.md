@@ -9,10 +9,10 @@
 - MongoDB
 
 #### Environmental Variables
-`DB_USER =      <database username>`place the database username here
-`DB_PW =        <database password>` place the database user's password here
-`DB_INFO =      <database-uri>` place the uri that will be used to connect to a mongo instance
-`COOKIE_SECRET= <secret-string> ` place any random string here; will be used to create sessions for users
+- `DB_USER =      <database username>`place the database username here
+- `DB_PW =        <database password>` place the database user's password here
+- `DB_INFO =      <database-uri>` place the uri that will be used to connect to a mongo instance
+- `COOKIE_SECRET= <secret-string> ` place any random string here; will be used to create sessions for users
 
 #### Instructions
 1. clone the repository
