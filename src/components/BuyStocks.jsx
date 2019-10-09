@@ -141,26 +141,30 @@ class BuyStocks extends Component {
     }
 
 	render(){
-		return(
-			<div className="col">
-                <div>Cash - ${(this.props.balance.toFixed(2))}</div>
-                <div className="spacer"></div>
-                <form onSubmit={this.handleSubmit}>
-                    <div className="form-group">
-                    <label htmlFor="Ticker">Ticker Symbol</label>
-                    <input type="text" className="form-control" placeholder="TSLA, NFLX, AMZN..." onChange={this.handleChange}/>
-                    
-                    </div>
-                    <div className="form-group">
-                    <label htmlFor="Quantity">Quantity</label>
-                    <input type="number" className="form-control" placeholder="12..." onChange={this.handleQty}/>
-                    <small className="form-text" style={this.state.condColor}>Please enter only whole numbers and valid ticker symbols.</small>
-                    </div>
-                    
-                    <button type="submit" className="btn btn-primary">Purchase</button>
-                </form>
-            </div>
-		);
+        try{
+            return(
+                <div className="col">
+                    <div>Cash - ${(this.props.balance.toFixed(2))}</div>
+                    <div className="spacer"></div>
+                    <form onSubmit={this.handleSubmit}>
+                        <div className="form-group">
+                        <label htmlFor="Ticker">Ticker Symbol</label>
+                        <input type="text" className="form-control" placeholder="TSLA, NFLX, AMZN..." onChange={this.handleChange}/>
+                        
+                        </div>
+                        <div className="form-group">
+                        <label htmlFor="Quantity">Quantity</label>
+                        <input type="number" className="form-control" placeholder="12..." onChange={this.handleQty}/>
+                        <small className="form-text" style={this.state.condColor}>Please enter only whole numbers and valid ticker symbols.</small>
+                        </div>
+                        
+                        <button type="submit" className="btn btn-primary">Purchase</button>
+                    </form>
+                </div>
+            );
+        }catch(e){
+            console.log(e);
+        }
 	}
 
 

@@ -4,7 +4,7 @@ const path = require('path');
 const cookieSession = require('cookie-session');
 const authRoutes = require('./routes/authRoutes')
 const api = require(path.join(__dirname,'/routes'));
-const PATH_DIR = process.env.NODE_ENV === 'production' ? 'build' : 'public';
+const PATH_DIR = process.env.NODE_ENV === 'production' ? 'client/build' : 'public';
 const isDevMode = process.env.NODE_ENV === 'production' ? false : true;
 const port = process.env.PORT || 8080;
 var {db, User} = require('./models/dbConfig')
@@ -41,11 +41,15 @@ const checkAuth = (req,res,next) =>{
 	}
 }
 
-app.use(express.static(path.join(__dirname, `../src/${PATH_DIR}`)));
+
 
 app.use('/auth',authRoutes);
 app.use('/api',checkAuth,api);
 
+app.use(express.static(path.join(__dirname, `../${PATH_DIR}`)));
+// app.get('*', (req, res) => {
+// 	res.sendFile(path.join(__dirname + `../${PATH_DIR}/index.html`))
+//   })
 
 
 app.listen(port,()=>{

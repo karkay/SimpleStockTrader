@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import { Redirect } from 'react-router-dom';
 import BuyStocks from './BuyStocks';
-import Login from './Login';
 const axios = require('axios');
 let API_KEY = "ZWZTAOSWFD17KO03";
 API_KEY = "H2TW3V7T3APHYLEM";
@@ -182,25 +181,29 @@ class Portfolio extends Component {
 	}
 
 	async createPortfolio(){
-		console.log(this.props.srvState)
-		let myPortfolio = {};
-		if(this.props.srvState !== null && this.props.srvState.auth){
-			let trans = await this.getTransactions();
-			console.log(trans);
-			trans.forEach((tx)=>{
-				if(tx.symbol in myPortfolio){
-					console.log(myPortfolio[tx.symbol]);
-					myPortfolio[tx.symbol] = {...myPortfolio[tx.symbol], numShares: tx.numShares + myPortfolio[tx.symbol]["numShares"]}
-				}else{
-					console.log(tx.symbol, " was not found in my portfolio; thus add.");
-					myPortfolio[tx.symbol] = tx;
-				}
-			})
-			console.log("created portfolio!: ",myPortfolio)
-			this.setState({portfolio: myPortfolio})
-			
-		}else{
-			console.log("props empty");
+		try{
+			console.log(this.props.srvState)
+			let myPortfolio = {};
+			if(this.props.srvState !== null && this.props.srvState.auth){
+				let trans = await this.getTransactions();
+				console.log(trans);
+				trans.forEach((tx)=>{
+					if(tx.symbol in myPortfolio){
+						console.log(myPortfolio[tx.symbol]);
+						myPortfolio[tx.symbol] = {...myPortfolio[tx.symbol], numShares: tx.numShares + myPortfolio[tx.symbol]["numShares"]}
+					}else{
+						console.log(tx.symbol, " was not found in my portfolio; thus add.");
+						myPortfolio[tx.symbol] = tx;
+					}
+				})
+				console.log("created portfolio!: ",myPortfolio)
+				this.setState({portfolio: myPortfolio})
+				
+			}else{
+				console.log("props empty");
+			}
+		}catch(e){
+			console.log(e);
 		}
 	}
 

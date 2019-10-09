@@ -1,7 +1,5 @@
 import React, { Component } from 'react';
 import Axios from 'axios';
-import { resolve } from 'url';
-import { reject } from 'q';
 
 class Transactions extends Component {
 	constructor(props){
