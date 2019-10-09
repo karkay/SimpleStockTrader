@@ -28,25 +28,31 @@ class BuyStocks extends Component {
 					apikey: API_KEY
 				}
 			}).then(function(res){
-				console.log(res.data);
-				let ans = {symbol: sym, currentPrice: 0};
-				if("Note" in res.data) resolve(ans)
-				const dataObj = res.data;
-				const priceData = dataObj[`Time Series (${intv})`];
-				const metaObj = dataObj["Meta Data"];
-				const recentDate = metaObj["3. Last Refreshed"];
-				const cPrice = priceData[recentDate]["1. open"];
-				console.log("gcp debug: ",[dataObj,priceData,metaObj,recentDate,cPrice]);
-				if(typeof priceData !== 'undefined' && typeof metaObj !== 'undefined' && typeof recentDate !== 'undefined' && typeof cPrice !== 'undefined'){
-					ans.currentPrice = parseFloat(cPrice);
-				}
-				console.log("gcp:",ans)
-				resolve(ans)
+                try{
+                    console.log(res.data);
+                    let ans = {symbol: sym, currentPrice: 0};
+                    if("Note" in res.data) resolve(ans)
+                    const dataObj = res.data;
+                    const priceData = dataObj[`Time Series (${intv})`];
+                    const metaObj = dataObj["Meta Data"];
+                    const recentDate = metaObj["3. Last Refreshed"];
+                    const cPrice = priceData[recentDate]["1. open"];
+                    console.log("gcp debug: ",[dataObj,priceData,metaObj,recentDate,cPrice]);
+                    if(typeof priceData !== 'undefined' && typeof metaObj !== 'undefined' && typeof recentDate !== 'undefined' && typeof cPrice !== 'undefined'){
+                        ans.currentPrice = parseFloat(cPrice);
+                    }
+                    console.log("gcp:",ans)
+                    resolve(ans)
+                }
+                catch(e){
+                    console.log(e);
+				    resolve({symbol: sym, currentPrice: 0});
+                }
 				
 			}).catch(function(err){
 				console.log(err);
 				// resolve({symbol: sym, currentPrice: 0});
-				reject(err);
+				resolve({symbol: sym, currentPrice: 0});
 				
 			})
 		});
@@ -70,9 +76,7 @@ class BuyStocks extends Component {
 			})
 		});
 	}
-    getBalance(){
-		return 5000;
-    }
+    
 
     async validTicker(keyword){
         const resArr = await this.searchSymbol(keyword);
@@ -132,6 +136,7 @@ class BuyStocks extends Component {
         console.log(this.state);
     }
     componentDidMount(){
+
         console.log("buy stocks mounted")
     }
 

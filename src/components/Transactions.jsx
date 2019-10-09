@@ -1,4 +1,7 @@
 import React, { Component } from 'react';
+import Axios from 'axios';
+import { resolve } from 'url';
+import { reject } from 'q';
 
 class Transactions extends Component {
 	constructor(props){
@@ -8,7 +11,7 @@ class Transactions extends Component {
 		// }
 		this.state = {
 			auth: {
-				userclassName: "Kent"
+				userName: "Kent"
 			},
 			transactions: [
 				{
@@ -18,17 +21,38 @@ class Transactions extends Component {
 					costPerShare: 255.50
 				},
 				{
-					symbol: "APPL",
+					symbol: "AAPL",
 					side: "BUY",
 					numShares: 20,
 					costPerShare: 100.50
 				},
 			]
 		}
+		this.getTransactions = this.getTransactions.bind(this);
+	}
+	async getTransactions(){
+		return new Promise((resolve,reject)=>{
+			Axios.get('/api/transactions')
+			.then((a)=>{
+				console.log(a);
+				resolve(a.data);
+			})
+			.catch((e)=>{
+				console.log(e);
+				reject(e);
+			})
+		});
+	}
+	async componentDidMount(){
+		console.log(this.props.srvState);
+		let trans = await this.getTransactions();
+		console.log(trans);
+		this.setState({transactions: trans})
+		// this.setState({transactions: this.props.srvState.transactions})
 	}
 	renderContent(){
 		return this.state.transactions.map((tx)=>{
-			return <tr key ={tx.symbol + tx.side}>
+			return <tr key ={tx.symbol + tx.side+tx.costPerShare}>
 			<th scope="row">{tx.symbol}</th>
 			<td>{tx.side}</td>
 			<td>{tx.numShares}</td>

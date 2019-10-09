@@ -8,21 +8,18 @@ class Header extends Component {
 		// 	auth: null
 		// }
 		this.state = {
-			auth: {
-				userName: "Kent"
-			}
 		}
 	}
 	renderContent(){
-		switch(this.state.auth){
-			case null:
+		switch(this.props.srvState.auth){
+			case false:
 				return <div className="col">
 							Please <a href="/login" className="header-text">login</a> or <a href="/register" className="header-text">register</a>.
 					   </div>
 
 			default:
 				return <div className="col">
-							Welcome back, {this.state.auth.userName}
+							Welcome back, {this.props.srvState.email}
 								<br></br>
 								<NavLink className="header-text" id="transations" to="/transactions">Transactions
 								</NavLink>
@@ -39,7 +36,7 @@ class Header extends Component {
 			<div className = "container-fluid" id="header">
 				<div className ="row">
 					<div className="col" id="logo">
-						<a href="/" className="header-text">{this.props.name}</a>
+						{this.props.name}
 					</div>
 					<div className="col" id="state">
 						{this.renderContent()}
