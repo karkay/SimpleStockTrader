@@ -2,6 +2,8 @@
 ###### a demo stock trading app that allows you to perform account opening, trading stocks, and monitoring a portfolio.
 
 
+ **Note**
+ Deployed application on heroku has timeout issues.
 #### Prerequisites
 - NodeJS
 - NPM
