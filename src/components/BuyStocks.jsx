@@ -28,25 +28,31 @@ class BuyStocks extends Component {
 					apikey: API_KEY
 				}
 			}).then(function(res){
-				console.log(res.data);
-				let ans = {symbol: sym, currentPrice: 0};
-				if("Note" in res.data) resolve(ans)
-				const dataObj = res.data;
-				const priceData = dataObj[`Time Series (${intv})`];
-				const metaObj = dataObj["Meta Data"];
-				const recentDate = metaObj["3. Last Refreshed"];
-				const cPrice = priceData[recentDate]["1. open"];
-				console.log("gcp debug: ",[dataObj,priceData,metaObj,recentDate,cPrice]);
-				if(typeof priceData !== 'undefined' && typeof metaObj !== 'undefined' && typeof recentDate !== 'undefined' && typeof cPrice !== 'undefined'){
-					ans.currentPrice = parseFloat(cPrice);
-				}
-				console.log("gcp:",ans)
-				resolve(ans)
+                try{
+                    console.log(res.data);
+                    let ans = {symbol: sym, currentPrice: 0};
+                    if("Note" in res.data) resolve(ans)
+                    const dataObj = res.data;
+                    const priceData = dataObj[`Time Series (${intv})`];
+                    const metaObj = dataObj["Meta Data"];
+                    const recentDate = metaObj["3. Last Refreshed"];
+                    const cPrice = priceData[recentDate]["1. open"];
+                    console.log("gcp debug: ",[dataObj,priceData,metaObj,recentDate,cPrice]);
+                    if(typeof priceData !== 'undefined' && typeof metaObj !== 'undefined' && typeof recentDate !== 'undefined' && typeof cPrice !== 'undefined'){
+                        ans.currentPrice = parseFloat(cPrice);
+                    }
+                    console.log("gcp:",ans)
+                    resolve(ans)
+                }
+                catch(e){
+                    console.log(e);
+				    resolve({symbol: sym, currentPrice: 0});
+                }
 				
 			}).catch(function(err){
 				console.log(err);
 				// resolve({symbol: sym, currentPrice: 0});
-				reject(err);
+				resolve({symbol: sym, currentPrice: 0});
 				
 			})
 		});
@@ -70,9 +76,7 @@ class BuyStocks extends Component {
 			})
 		});
 	}
-    getBalance(){
-		return 5000;
-    }
+    
 
     async validTicker(keyword){
         const resArr = await this.searchSymbol(keyword);
@@ -132,30 +136,35 @@ class BuyStocks extends Component {
         console.log(this.state);
     }
     componentDidMount(){
+
         console.log("buy stocks mounted")
     }
 
 	render(){
-		return(
-			<div className="col">
-                <div>Cash - ${(this.props.balance.toFixed(2))}</div>
-                <div className="spacer"></div>
-                <form onSubmit={this.handleSubmit}>
-                    <div className="form-group">
-                    <label htmlFor="Ticker">Ticker Symbol</label>
-                    <input type="text" className="form-control" placeholder="TSLA, NFLX, AMZN..." onChange={this.handleChange}/>
-                    
-                    </div>
-                    <div className="form-group">
-                    <label htmlFor="Quantity">Quantity</label>
-                    <input type="number" className="form-control" placeholder="12..." onChange={this.handleQty}/>
-                    <small className="form-text" style={this.state.condColor}>Please enter only whole numbers and valid ticker symbols.</small>
-                    </div>
-                    
-                    <button type="submit" className="btn btn-primary">Purchase</button>
-                </form>
-            </div>
-		);
+        try{
+            return(
+                <div className="col">
+                    <div>Cash - ${(this.props.balance.toFixed(2))}</div>
+                    <div className="spacer"></div>
+                    <form onSubmit={this.handleSubmit}>
+                        <div className="form-group">
+                        <label htmlFor="Ticker">Ticker Symbol</label>
+                        <input type="text" className="form-control" placeholder="TSLA, NFLX, AMZN..." onChange={this.handleChange}/>
+                        
+                        </div>
+                        <div className="form-group">
+                        <label htmlFor="Quantity">Quantity</label>
+                        <input type="number" className="form-control" placeholder="12..." onChange={this.handleQty}/>
+                        <small className="form-text" style={this.state.condColor}>Please enter only whole numbers and valid ticker symbols.</small>
+                        </div>
+                        
+                        <button type="submit" className="btn btn-primary">Purchase</button>
+                    </form>
+                </div>
+            );
+        }catch(e){
+            console.log(e);
+        }
 	}
 
 

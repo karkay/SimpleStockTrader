@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
+import { Redirect } from 'react-router-dom';
 import BuyStocks from './BuyStocks';
 const axios = require('axios');
-require('dotenv').config();
 let API_KEY = "ZWZTAOSWFD17KO03";
 API_KEY = "H2TW3V7T3APHYLEM";
 
@@ -10,33 +10,37 @@ API_KEY = "H2TW3V7T3APHYLEM";
 class Portfolio extends Component {
 	constructor(props){
 		super(props);
-		this.state = {
-			auth: {
-				userName: "Kent"
-			},
-			balance: 5000,
-			portfolio: {
-				TSLA:{
-					symbol: "TSLA",
-					side: "BUY",
-					numShares: 15,
-					value: 0,
-					dailyPrice: 0,
-					currentPrice: 0
-				},
-				AAPL:{
-					symbol: "AAPL",
-					side: "BUY",
-					numShares: 20,
-					value: 0,
-					dailyPrice: 0,
-					currentPrice: 0
-				}
+		this.timer = null;
+		// this.state = {
+		// 	balance: 5000,
+		// 	portfolio: {
+		// 		TSLA:{
+		// 			symbol: "TSLA",
+		// 			side: "BUY",
+		// 			numShares: 15,
+		// 			value: 0,
+		// 			dailyPrice: 0,
+		// 			currentPrice: 0
+		// 		},
+		// 		AAPL:{
+		// 			symbol: "AAPL",
+		// 			side: "BUY",
+		// 			numShares: 20,
+		// 			value: 0,
+		// 			dailyPrice: 0,
+		// 			currentPrice: 0
+		// 		}
 
+		// 	}
+		// }
+		this.state = {
+			balance: 0,
+			portfolio: {
 			}
 		}
 		this.handler = this.handler.bind(this)
 		this.spinner = this.spinner.bind(this)
+
 	}
 	getDailyOpenPrice(sym){
 		return new Promise((resolve,reject)=>{
@@ -82,6 +86,7 @@ class Portfolio extends Component {
 					apikey: API_KEY
 				}
 			}).then(function(res){
+				try{
 				console.log(res.data);
 				let ans = {symbol: sym, currentPrice: 0};
 				if("Note" in res.data) resolve(ans)
@@ -96,6 +101,10 @@ class Portfolio extends Component {
 				}
 				console.log("gcp:",ans)
 				resolve(ans)
+			}catch(e){
+				console.log(e);
+				resolve({symbol: sym, currentPrice: 0});
+			}
 				
 			}).catch(function(err){
 				console.log(err);
@@ -110,6 +119,7 @@ class Portfolio extends Component {
 	}
 
 	updateCurrentPrice(){
+		
 		let copyOfTransactions = {...this.state.portfolio};
 		let currentPriceList = []
 		Object.keys(this.state.portfolio).forEach((key)=>{
@@ -141,15 +151,70 @@ class Portfolio extends Component {
 
 	componentDidUpdate(){
 		console.log("portfolio updated")
-		setTimeout(()=> this.updateCurrentPrice(),60000);
+		
+		this.timer = setTimeout(()=> this.updateCurrentPrice(),60000);
 	}
 	componentWillUnmount(){
-
+		clearTimeout(this.timer);
+	}
+	async getBalance(){
+		return new Promise((resolve,reject)=>{
+            axios.get('/api/user/balance')
+            .then((a)=>{
+                resolve(a.data.balance);
+            })
+            .catch((e)=>{
+                reject(e);
+            })
+        })
+    }
+	async getTransactions(){
+		return new Promise((resolve,reject)=>{
+			axios.get('/api/transactions')
+			.then((a)=>{
+				resolve(a.data);
+			})
+			.catch((e)=>{
+				reject(e);
+			})
+		})
 	}
 
+	async createPortfolio(){
+		try{
+			console.log(this.props.srvState)
+			let myPortfolio = {};
+			if(this.props.srvState !== null && this.props.srvState.auth){
+				let trans = await this.getTransactions();
+				console.log(trans);
+				trans.forEach((tx)=>{
+					if(tx.symbol in myPortfolio){
+						console.log(myPortfolio[tx.symbol]);
+						myPortfolio[tx.symbol] = {...myPortfolio[tx.symbol], numShares: tx.numShares + myPortfolio[tx.symbol]["numShares"]}
+					}else{
+						console.log(tx.symbol, " was not found in my portfolio; thus add.");
+						myPortfolio[tx.symbol] = tx;
+					}
+				})
+				console.log("created portfolio!: ",myPortfolio)
+				this.setState({portfolio: myPortfolio})
+				
+			}else{
+				console.log("props empty");
+			}
+		}catch(e){
+			console.log(e);
+		}
+	}
 
-	componentDidMount(){
+	async componentDidMount(){
+		this.createPortfolio();
+		let bal = await this.getBalance();
+		this.setState({balance: bal});
+		console.log("portfolio mounted",this.state);
+
 		
+		console.log(this.props);
 		let dailyOpenList = []
 		let currentPriceList = []
 		Object.keys(this.state.portfolio).forEach((key,i)=>{
@@ -210,9 +275,11 @@ class Portfolio extends Component {
 		.catch((e)=>{
 			console.log("error fetching daily prices.",e)
 		})
+
 		console.log("portfolio mounted.")
 		
 	}
+	
 	renderPortfolio(){
 		return Object.keys(this.state.portfolio).map((key,i)=>{
 			// console.log(tx);
@@ -239,11 +306,58 @@ class Portfolio extends Component {
 					</tr>
 		});
 	}
+	renderComponent(){
+		return <div className="container" id="portfolio-container">
+				
+		<div className="row" id ="portfolio-header">Portfolio</div>
+		<div className="row">
+			<div className="col">
+				<table className="table table-striped">
+				  <thead>
+					<tr>
+					  <th scope="col">Name</th>
+					  <th scope="col">Number of Shares</th>
+					  <th scope="col">Value</th>
+					  <th scope="col">Current Price</th>
 
-	handler(newState){
+					</tr>
+				  </thead>
+				  <tbody>
+				  {this.renderPortfolio()}
+				  </tbody>
+				</table>
+			</div>
+			<BuyStocks handler={this.handler} balance={this.state.balance}/>
+		</div>
+	</div>
+	}
+	async purchase(newState){
+		return new Promise((resolve,reject)=>{
+			axios.post('/api/transactions',
+				{
+					symbol: newState.symbol,
+					currentPrice: newState.currentPrice,
+					dailyPrice: newState.dailyPrice,
+					costPerShare: newState.currentPrice,
+					numShares: newState.numShares,
+					side: newState.side
+				}
+			)
+			.then((a)=>{
+				resolve(a.data.success);
+			})
+			.catch((e)=>{
+				reject(e);
+			})
+		})
+	}
+
+	async handler(newState){
 		console.log("child calling parent: ",newState)
-		let copy = []
-		copy = Object.keys(this.state.portfolio).map((key,i)=>{
+		let status = await this.purchase(newState);
+		if(status){
+			let copy = []
+			copy = Object.keys(this.state.portfolio).map((key,i)=>{
 			let x = this.state.portfolio[key];
 			if(x.symbol === newState.symbol){
 				let newX = {
@@ -259,35 +373,20 @@ class Portfolio extends Component {
 			balance: newState.balance,
 			portfolio: copy
 		})
+		}else{
+			console.log("not enough money or something else.")
+		}
+
+
+	}
+	errorLogin(){
+		return <Redirect to='/login'/>
+		// return <div>please login</div>
 	}
 
 	
 	render(){
-		return(
-			<div className="container" id="portfolio-container">
-				
-				<div className="row" id ="portfolio-header">Portfolio</div>
-				<div className="row">
-					<div className="col">
-						<table className="table table-striped">
-						  <thead>
-						    <tr>
-						      <th scope="col">Name</th>
-						      <th scope="col">Number of Shares</th>
-						      <th scope="col">Value</th>
-							  <th scope="col">Current Price</th>
-
-						    </tr>
-						  </thead>
-						  <tbody>
-						  {this.renderPortfolio()}
-						  </tbody>
-						</table>
-					</div>
-					<BuyStocks handler={this.handler} balance={this.state.balance}/>
-				</div>
-			</div>
-		);
+		return (this.props.srvState.auth === false ? this.errorLogin() : this.renderComponent());
 	}
 
 
