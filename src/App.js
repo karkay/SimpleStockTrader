@@ -35,7 +35,7 @@ class App extends Component{
       <BrowserRouter>
         <div>
           <Header name={this.state.appName} srvState={this.state}/>
-          <Route exact path="/" render={()=><Portfolio srvState={this.state} handler={this.handler}/>}/>
+          <Route exact path="/" render={()=><Login srvState={this.state} handler={this.handler}/>}/>
           <Route exact path="/transactions" render={()=><Transactions srvState={this.state} handler={this.handler}/>}/>
           <Route exact path="/portfolio" render={()=><Portfolio srvState={this.state} handler={this.handler}/>}/>
           <Route exact path="/login" render={()=><Login srvState={this.state} handler={this.handler}/>}/>

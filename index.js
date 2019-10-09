@@ -2,12 +2,12 @@ require('dotenv').config()
 const express = require('express');
 const path = require('path');
 const cookieSession = require('cookie-session');
-const authRoutes = require('./routes/authRoutes')
-const api = require(path.join(__dirname,'/routes'));
-const PATH_DIR = process.env.NODE_ENV === 'production' ? 'client/build' : 'public';
+const authRoutes = require('./backend/routes/authRoutes')
+const api = require(path.join(__dirname,'/backend/routes'));
+const PATH_DIR = process.env.NODE_ENV === 'production' ? 'build' : 'public';
 const isDevMode = process.env.NODE_ENV === 'production' ? false : true;
-const port = process.env.PORT || 8080;
-var {db, User} = require('./models/dbConfig')
+const port = process.env.PORT || 5000;
+var {db, User} = require('./backend/models/dbConfig')
 const passport = require('passport');
 
 
@@ -45,11 +45,12 @@ const checkAuth = (req,res,next) =>{
 
 app.use('/auth',authRoutes);
 app.use('/api',checkAuth,api);
-
-app.use(express.static(path.join(__dirname, `../${PATH_DIR}`)));
-// app.get('*', (req, res) => {
-// 	res.sendFile(path.join(__dirname + `../${PATH_DIR}/index.html`))
-//   })
+console.log("HAHA: ",path.join(__dirname, PATH_DIR));
+app.use(express.static(path.join(__dirname, PATH_DIR)));
+app.get('*', (req, res) => {
+    console.log(path.join(__dirname, PATH_DIR,'index.html'));
+	res.sendFile(path.join(__dirname, PATH_DIR,'index.html'))
+  })
 
 
 app.listen(port,()=>{

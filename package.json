@@ -13,6 +13,7 @@
     "concurrently": "^5.0.0",
     "cookie-session": "^1.3.3",
     "dotenv": "^8.1.0",
+    "http-proxy-middleware": "^0.20.0",
     "mongoose": "^5.7.3",
     "passport": "^0.4.0",
     "passport-local": "^1.0.0",
@@ -23,10 +24,10 @@
     "typescript": "^3.6.3"
   },
   "scripts": {
-    "start": "react-scripts start",
+    "start": "node index.js",
     "build": "react-scripts build",
-    "dev": "concurrently \"npm start\" \"npm run-script start\"",
-    "heroku-postbuild": "npm build"
+    "eject": "react-scripts eject",
+    "heroku-postbuild": "npm install && npm install --only=dev --no-shrinkwrap && npm run build"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -42,6 +43,5 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
-  },
-  "proxy": "https://simple-stock-tradr.herokuapp.com/:8080"
+  }
 }
