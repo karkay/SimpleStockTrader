@@ -6,18 +6,18 @@ Router.get('*',(req,res,next)=>{
     User.findOne({email: req.user.email},function(err,user){
         console.log("get trans",err,user);
         if(err) next(err);
-        if(!user) res.send([]);
-        res.send(user.transactions);
+        if(!user) return res.send([]);
+        return res.send(user.transactions);
     })
 })
 Router.post('*',(req,res,next)=>{
     User.findOne({email:req.user.email},function(err,user){
         console.log("post trans",err,user);
         if(err) next(err);
-        if(!user) res.send({success:false,message:"user dne"});
+        if(!user) return res.send({success:false,message:"user dne"});
         const orderCost = req.body.costPerShare * req.body.numShares;
         if(user.balance < orderCost){
-            res.send({success:false,message:"insufficient balance"})
+            return res.send({success:false,message:"insufficient balance"})
         }
         let newTransList = [...user.transactions];
         newTransList.push(req.body);
@@ -26,7 +26,7 @@ Router.post('*',(req,res,next)=>{
         user.updateOne({transactions: newTransList, balance: newBal})
         .then((a)=>{
             console.log("transaction successful.");
-            res.send({success:true});
+            return res.send({success:true});
         })
         .catch((e)=>{
             next(err);

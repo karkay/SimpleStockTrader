@@ -5,12 +5,12 @@ Router.get('/balance',(req,res,next)=>{
     User.findOne({email: req.user.email},function(err,user){
         console.log("get balance",err,user);
         if(err) next(err);
-        if(!user) res.send({balance: 0});
-        res.send({balance: user.balance});
+        if(!user) return res.send({balance: 0});
+        return res.send({balance: user.balance});
     })
 })
 Router.post('/user',(req,res,next)=>{
-    res.send({...req.body,"ok":"creating/registering user."})
+    return res.send({...req.body,"ok":"creating/registering user."})
 })
 
 module.exports = Router;
