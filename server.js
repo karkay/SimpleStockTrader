@@ -45,10 +45,8 @@ const checkAuth = (req,res,next) =>{
 
 app.use('/auth',authRoutes);
 app.use('/api',checkAuth,api);
-console.log("HAHA: ",path.join(__dirname, PATH_DIR));
 app.use(express.static(path.join(__dirname, PATH_DIR)));
 app.get('*', (req, res) => {
-    console.log(path.join(__dirname, PATH_DIR,'index.html'));
 	res.sendFile(path.join(__dirname, PATH_DIR,'index.html'))
   })
 
